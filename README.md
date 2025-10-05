@@ -32,14 +32,13 @@ The second verification step involved querying the raw data directly in Promethe
 *<p align="center">Figure 3: A successful PromQL query returning live, labeled telemetry from cAdvisor.</p>*
 
 ---
-## Phase 3: Visualization & Analysis in Grafana
+Phase 3: Visualization & Analysis for Security Monitoring
+The final phase was to visualize the collected telemetry in Grafana to perform security-focused analysis. After adding Prometheus as a data source, I created dashboards to monitor per-container resource utilization, with a specific focus on network I/O.
 
-The final phase was to visualize the collected telemetry in Grafana. After adding Prometheus as a data source, I imported pre-built dashboards to create a rich, real-time view of the environment's health, focusing on per-container resource utilization.
+Analysis: Monitoring network traffic is a core security function. The Grafana dashboard below visualizes the received and transmitted network traffic for every container on the host. This allows an analyst to establish a baseline for normal activity and immediately spot anomalies, such as a sudden, unexpected spike in outbound traffic (Sent Network Traffic), which could be a key indicator of a data exfiltration attempt.
 
-**Analysis:** The Grafana dashboard panel below visualizes the CPU usage across every container running on the host. This allows for at-a-glance identification of resource-intensive services and provides the granular data needed for performance analysis and anomaly detection.
-
-<img src="./assets/CA-Advisor CPU Usage.png" width="800" alt="Grafana dashboard showing CPU usage per container">
-*<p align="center">Figure 4: The final Grafana dashboard visualizing per-container CPU metrics.</p>*
+<img src="./assets/CA-Advisor Network Traffic .png" width="800" alt="Grafana dashboard showing network traffic per container">
+<p align="center">Figure 4: The final Grafana dashboard visualizing per-container network traffic for anomaly detection.</p>
 
 ---
 ## Conclusion

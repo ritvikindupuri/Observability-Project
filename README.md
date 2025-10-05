@@ -5,46 +5,53 @@ This project documents the end-to-end process of building a production-grade mon
 The result is a powerful, real-time telemetry platform capable of monitoring both host-level and per-container metrics, providing critical insights for performance tuning, troubleshooting, and security analysis.
 
 ---
-## Architecture Diagram
+## Phase 1: Orchestrator & Monitoring Stack Deployment
 
-Here is the high-level architecture of the self-hosted monitoring solution:
+The project began on a bare metal Ubuntu server. After installing Docker, the **Coolify** PaaS was deployed to act as the primary orchestrator and management plane. Using a custom Docker Compose file within Coolify, the entire monitoring stack was deployed as a set of interconnected services.
 
-```mermaid
-graph TD
-    subgraph User Access
-        A[Grafana Web UI (Port 3000)]
-        B[Prometheus UI (Port 9090)]
-        C[Coolify UI (Port 8000)]
-        D[cAdvisor UI (Port 8081)]
-    end
+**Analysis:** The Coolify dashboard below confirms a successful deployment. It shows all core monitoring services—Prometheus (scraper), Node Exporter (host metrics), cAdvisor (container metrics), and Grafana (visualizer)—are running and managed by the orchestrator.
 
-    subgraph Coolify Host (Ubuntu Server)
-        direction LR
+<img src="./assets/All Services on Coolify.png" width="800" alt="Coolify dashboard showing all running services">
+*<p align="center">Figure 1: The Coolify control plane with the successfully deployed monitoring stack.</p>*
 
-        subgraph Docker Network
-            cadvisor(cAdvisor<br>(8080 --> 8081)<br>Exports: CPU/Mem, Disk I/O, Net I/O)
-            node_exporter(Node Exporter<br>(9100)<br>Exports: CPU/Mem, Disk I/O, Net Stats)
-            prometheus(Prometheus<br>(9090)<br>Scrapes: cAdvisor, Node Exporter, Itself)
-            grafana(Grafana<br>(3000)<br>Dashboards, PromQL)
-            coolify(Coolify<br>(8000)<br>Manages, Deploys)
-        end
+---
+## Phase 2: Verification of the Data Pipeline
 
-        node_exporter --> prometheus
-        cadvisor --> prometheus
-        prometheus --> grafana
-        coolify --> grafana
-        coolify --> prometheus
-        coolify --> cadvisor
-        coolify --> node_exporter
-    end
+With the stack deployed, the next critical phase was to verify that the data pipeline was working correctly from end to end.
 
-    A -- "Accesses" --> coolify
-    B -- "Accesses" --> coolify
-    C -- "Accesses" --> coolify
-    D -- "Accesses" --> coolify
+### Verifying the Scrape Pipeline
+The first step was to check the Prometheus Targets UI. A healthy "UP" state for all jobs confirms that Prometheus is successfully connecting to and scraping metrics from both the Node Exporter and cAdvisor endpoints.
 
-    style coolify fill:#f9f,stroke:#333,stroke-width:2px
-    style prometheus fill:#ccf,stroke:#333,stroke-width:2px
-    style grafana fill:#cfc,stroke:#333,stroke-width:2px
-    style cadvisor fill:#ffc,stroke:#333,stroke-width:2px
-    style node_exporter fill:#fcc,stroke:#333,stroke-width:2px
+<img src="./assets/Live Exporters (Prometheus).png" width="800" alt="Prometheus Targets UI showing all jobs are UP">
+*<p align="center">Figure 2: All scrape targets are healthy, confirming a successful data ingestion pipeline.</p>*
+
+### Verifying Metric Ingestion with PromQL
+The second verification step involved querying the raw data directly in Prometheus. By running a **PromQL** query for a known container metric like `container_cpu_usage_seconds_total`, I could confirm that labeled, time-series data was being successfully ingested and stored from cAdvisor.
+
+<img src="./assets/Container CPU Metrics (Prometheus).png" width="800" alt="PromQL query showing live container CPU metrics">
+*<p align="center">Figure 3: A successful PromQL query returning live, labeled telemetry from cAdvisor.</p>*
+
+---
+## Phase 3: Visualization & Analysis in Grafana
+
+The final phase was to visualize the collected telemetry in Grafana. After adding Prometheus as a data source, I imported pre-built dashboards to create a rich, real-time view of the environment's health, focusing on per-container resource utilization.
+
+**Analysis:** The Grafana dashboard panel below visualizes the CPU usage across every container running on the host. This allows for at-a-glance identification of resource-intensive services and provides the granular data needed for performance analysis and anomaly detection.
+
+<img src="./assets/CA-Advisor CPU Usage.png" width="800" alt="Grafana dashboard showing CPU usage per container">
+*<p align="center">Figure 4: The final Grafana dashboard visualizing per-container CPU metrics.</p>*
+
+---
+## Conclusion
+
+This project successfully demonstrates the creation of a comprehensive, self-hosted monitoring solution for containerized environments. By integrating a suite of industry-standard open-source tools, it provides the deep visibility necessary for maintaining system health, ensuring performance, and enabling foundational security monitoring. The skills showcased—from bare metal setup and container orchestration to data pipeline verification and final visualization—are directly applicable to modern DevOps, SRE, and cybersecurity roles where robust observability is a critical requirement.
+
+---
+## 🚀 Skills & Technologies Demonstrated
+
+* **Containerization & Orchestration:** Docker, Docker Compose, Coolify (PaaS).
+* **Monitoring & Observability:** Prometheus, Grafana, Node Exporter, cAdvisor.
+* **Time-Series Databases:** Storing and querying metrics with Prometheus & PromQL.
+* **Data Visualization:** Building and configuring dashboards in Grafana.
+* **System Administration:** Initial server setup and tool installation on Ubuntu Linux.
+* **Network Configuration:** Managing container networks and port mappings.

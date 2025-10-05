@@ -1,0 +1,93 @@
+# ======================================================================
+#  CYBER OBSERVABILITY STACK – Coolify + Prometheus + Grafana + cAdvisor + Node Exporter
+# ----------------------------------------------------------------------
+#  Description:
+#  This Docker Compose file deploys a full self-hosted monitoring environment on Ubuntu.
+#  It includes Prometheus for metrics collection, Grafana for visualization,
+#  cAdvisor for container-level telemetry, and Node Exporter for host metrics.
+#
+#  Deployment:
+#  1. Save this file as `docker-compose.yml`
+#  2. Run `docker compose up -d` or deploy via Coolify as a Docker Compose Resource.
+#  3. Access services:
+#     - Grafana:      http://<server-ip>:3000
+#     - Prometheus:   http://<server-ip>:9090
+#     - cAdvisor UI:  http://<server-ip>:8081
+#     - Coolify:      http://<server-ip>:8000
+#
+#  Author: Ritvik Indupuri
+#
+# ======================================================================
+
+version: "3.8"
+
+services:
+  prometheus:
+    image: prom/prometheus:latest
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+    volumes:
+      - prometheus-data:/prometheus
+    configs:
+      - source: prometheus-config
+        target: /etc/prometheus/prometheus.yml
+
+  node-exporter:
+    image: prom/node-exporter:latest
+    restart: unless-stopped
+    ports:
+      - "9100:9100"
+    command:
+      - "--path.rootfs=/host"
+    volumes:
+      - "/:/host:ro,rslave"
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    restart: unless-stopped
+    ports:
+      - "8081:8080"     # host 8081 avoids conflict with Coolify (8080)
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro
+    # privileged: true   # uncomment if cgroups access denied
+
+  grafana:
+    image: grafana/grafana-oss:latest
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana-storage:/var/lib/grafana
+
+configs:
+  prometheus-config:
+    content: |
+      global:
+        scrape_interval: 5s
+
+      scrape_configs:
+        - job_name: 'prometheus'
+          static_configs:
+            - targets: ['prometheus:9090']
+
+        - job_name: 'node-exporter'
+          static_configs:
+            - targets: ['node-exporter:9100']
+
+        - job_name: 'cadvisor'
+          static_configs:
+            - targets: ['cadvisor:8080']
+
+volumes:
+  prometheus-data:
+  grafana-storage:

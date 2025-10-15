@@ -52,5 +52,5 @@ This project successfully demonstrates the creation of a comprehensive, self-hos
 * **Monitoring & Observability:** Prometheus, Grafana, Node Exporter, cAdvisor.
 * **Time-Series Databases:** Storing and querying metrics with Prometheus & PromQL.
 * **Data Visualization:** Building and configuring dashboards in Grafana.
-* **System Administration:** Initial server setup and tool installation on Ubuntu Linux.
+* **System Administration:** Initial server setup and tool installation on Ubuntu 22.04 LTS.
 * **Network Configuration:** Managing container networks and port mappings.

@@ -46,7 +46,7 @@ Analysis: Monitoring network traffic is a core security function. The Grafana da
 This project successfully demonstrates the creation of a comprehensive, self-hosted monitoring solution for containerized environments. By integrating a suite of industry-standard open-source tools, it provides the deep visibility necessary for maintaining system health, ensuring performance, and enabling foundational security monitoring. The skills showcased—from bare metal setup and container orchestration to data pipeline verification and final visualization—are directly applicable to modern DevOps, SRE, and cybersecurity roles where robust observability is a critical requirement.
 
 ---
-## 🚀 Skills & Technologies Demonstrated
+##  Skills & Technologies Demonstrated
 
 * **Containerization & Orchestration:** Docker, Docker Compose, Coolify (PaaS).
 * **Monitoring & Observability:** Prometheus, Grafana, Node Exporter, cAdvisor.

@@ -24,7 +24,7 @@ version: "3.8"
 
 services:
   prometheus:
-    image: prom/prometheus:latest
+    image: prom/prometheus:v3.9.1@sha256:1f0f50f06acaceb0f5670d2c8a658a599affe7b0d8e78b898c1035653849a702
     restart: unless-stopped
     ports:
       - "9090:9090"
@@ -37,7 +37,7 @@ services:
         target: /etc/prometheus/prometheus.yml
 
   node-exporter:
-    image: prom/node-exporter:latest
+    image: prom/node-exporter:v1.9.1@sha256:d00a542e409ee618a4edc67da14dd48c5da66726bbd5537ab2af9c1dfc442c8a
     restart: unless-stopped
     ports:
       - "9100:9100"
@@ -47,7 +47,7 @@ services:
       - "/:/host:ro,rslave"
 
   cadvisor:
-    image: gcr.io/cadvisor/cadvisor:latest
+    image: gcr.io/cadvisor/cadvisor:v0.55.1@sha256:3de2bd5203120b866d74a9b283b2ffb8ec382fbf9dc321814700c6ea6f44ec57
     restart: unless-stopped
     ports:
       - "8081:8080"     # host 8081 avoids conflict with Coolify (8080)
@@ -60,7 +60,7 @@ services:
     # privileged: true   # uncomment if cgroups access denied
 
   grafana:
-    image: grafana/grafana-oss:latest
+    image: grafana/grafana-oss:13.0.2@sha256:5dad0df181cb644a14e13617b913b261a54f7d4fd4510721dba420929f35bea2
     restart: unless-stopped
     ports:
       - "3000:3000"

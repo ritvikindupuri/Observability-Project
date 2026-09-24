@@ -53,10 +53,14 @@ services:
       - "8081:8080"     # host 8081 avoids conflict with Coolify (8080)
     volumes:
       - /:/rootfs:ro
-      - /var/run:/var/run:rw
+      - /var/run/docker.sock:/var/run/docker.sock:ro
       - /sys:/sys:ro
       - /var/lib/docker/:/var/lib/docker:ro
       - /dev/disk/:/dev/disk:ro
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
     # privileged: true   # uncomment if cgroups access denied
 
   grafana:

@@ -45,6 +45,8 @@ Analysis: Monitoring network traffic is a core security function. The Grafana da
 
 **Docker Socket Protection:** cAdvisor requires access to Docker's control plane to gather container metrics. Instead of mounting the raw Docker socket (`/var/run/docker.sock`), which would grant root-equivalent control over the host, cAdvisor connects through a read-only API proxy (`tecnativa/docker-socket-proxy`) running on an isolated internal network. The proxy is configured to expose only the minimal set of Docker API endpoints required for metric collection (`CONTAINERS=1`, `INFO=1`, `IMAGES=1`, `VERSION=1`) while explicitly blocking all write operations (`POST=0`). This prevents cAdvisor—which is exposed on host port 8081—from being exploited to create privileged containers or perform other dangerous host operations, even if compromised.
 
+**Non-Recursive Root Mount:** The host root filesystem (`/`) is mounted to cAdvisor at `/rootfs` with `bind.recursive: disabled` (Docker Compose 2.26+ and Docker Engine 25+ required). This ensures that tmpfs mounts under `/run` (including `/run/docker.sock` and `/run/containerd/containerd.sock`) are not visible inside the container, preventing socket access that would bypass the proxy. You can verify with: `docker compose exec cadvisor ls -l /rootfs/run/docker.sock /rootfs/var/run/docker.sock` — both paths should not exist. **Trade-off:** Some host filesystem statistics for mounts under `/` may no longer appear in cAdvisor metrics. Container metrics remain unaffected as they flow through the proxy. **Note:** If per-container disk usage shows empty due to `cap_drop: ALL`, add `cap_add: [DAC_READ_SEARCH]` to the cadvisor service.
+
 ---
 ## Conclusion
 

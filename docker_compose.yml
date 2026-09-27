@@ -70,7 +70,12 @@ services:
     command:
       - "--docker=tcp://docker-socket-proxy:2375"
     volumes:
-      - /:/rootfs:ro
+      - type: bind
+        source: /
+        target: /rootfs
+        read_only: true
+        bind:
+          recursive: disabled
       - /sys:/sys:ro
       - /var/lib/docker/:/var/lib/docker:ro
       - /dev/disk/:/dev/disk:ro

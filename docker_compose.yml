@@ -23,6 +23,22 @@
 version: "3.8"
 
 services:
+  docker-socket-proxy:
+    image: tecnativa/docker-socket-proxy:0.3.0@sha256:9e4b9e7517a6b660f2cc903a19b257b1852d5b3344794e3ea334ff00ae677ac2
+    restart: unless-stopped
+    environment:
+      - CONTAINERS=1
+      - INFO=1
+      - IMAGES=1
+      - VERSION=1
+      - POST=0
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - docker-api
+
   prometheus:
     image: prom/prometheus:latest
     restart: unless-stopped
@@ -51,9 +67,10 @@ services:
     restart: unless-stopped
     ports:
       - "8081:8080"     # host 8081 avoids conflict with Coolify (8080)
+    command:
+      - "--docker=tcp://docker-socket-proxy:2375"
     volumes:
       - /:/rootfs:ro
-      - /var/run/docker.sock:/var/run/docker.sock:ro
       - /sys:/sys:ro
       - /var/lib/docker/:/var/lib/docker:ro
       - /dev/disk/:/dev/disk:ro
@@ -61,6 +78,11 @@ services:
       - no-new-privileges:true
     cap_drop:
       - ALL
+    networks:
+      - default
+      - docker-api
+    depends_on:
+      - docker-socket-proxy
     # privileged: true   # uncomment if cgroups access denied
 
   grafana:
@@ -96,3 +118,8 @@ configs:
 volumes:
   prometheus-data:
   grafana-storage:
+
+networks:
+  default:
+  docker-api:
+    internal: true

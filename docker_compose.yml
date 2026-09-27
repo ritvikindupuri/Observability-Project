@@ -88,7 +88,7 @@ services:
       - docker-api
     depends_on:
       - docker-socket-proxy
-    # privileged: true   # uncomment if cgroups access denied
+    # Do NOT set privileged: true; it undoes this hardening. If some metrics (e.g. per-container disk usage) come back empty, add: cap_add: [DAC_READ_SEARCH]
 
   grafana:
     image: grafana/grafana-oss:latest

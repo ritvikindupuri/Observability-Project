@@ -5,6 +5,39 @@ This project documents the end-to-end process of building a production-grade mon
 The result is a powerful, real-time telemetry platform capable of monitoring both host-level and per-container metrics, providing critical insights for performance tuning, troubleshooting, and security analysis.
 
 ---
+## Deployment Instructions
+
+### Prerequisites
+1. **Docker and Docker Compose** installed on your Ubuntu server
+2. **Secure credentials configured** before first deployment
+
+### Setup Steps
+
+**Important:** Before deploying the stack, you must configure Grafana credentials:
+
+```bash
+# 1. Copy the environment template
+cp .env.example .env
+
+# 2. Edit .env and set a STRONG password
+nano .env
+
+# 3. Deploy the stack
+docker compose up -d
+```
+
+**Security Considerations:**
+- **The admin password environment variable only applies on Grafana's first start.** If you have an existing `grafana-storage` volume, it will keep the old password until you manually reset it using:
+  ```bash
+  docker exec -it <grafana-container> grafana cli admin reset-admin-password <new-password>
+  ```
+- **The original default password was committed to git history** (commit fe0f4e3, October 2025) and must be treated as compromised. If you deployed this stack before the credentials were externalized, rotate your password immediately.
+- Always use a strong, unique password (16+ characters with mixed case, numbers, and symbols).
+
+### Coolify Deployment
+When deploying via Coolify as a Docker Compose Resource, set the environment variables (`GF_SECURITY_ADMIN_USER` and `GF_SECURITY_ADMIN_PASSWORD`) directly in the Coolify UI instead of using a `.env` file.
+
+---
 ## Phase 1: Orchestrator & Monitoring Stack Deployment
 
 The project began on a bare metal Ubuntu server. After installing Docker, the **Coolify** PaaS was deployed to act as the primary orchestrator and management plane. Using a custom Docker Compose file within Coolify, the entire monitoring stack was deployed as a set of interconnected services.

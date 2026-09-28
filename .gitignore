@@ -1,0 +1,6 @@
+# Environment variables (contains sensitive credentials)
+.env
+
+# Docker volumes
+*-data/
+*-storage/

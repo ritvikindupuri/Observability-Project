@@ -31,7 +31,7 @@ docker compose up -d
   ```bash
   docker exec -it <grafana-container> grafana cli admin reset-admin-password <new-password>
   ```
-- **The original default password (`admin`) was committed to git history** (commit fe0f4e3, October 2025) and must be treated as compromised. If you deployed this stack before the credentials were externalized, rotate your password immediately.
+- **The original default password was committed to git history** (commit fe0f4e3, October 2025) and must be treated as compromised. If you deployed this stack before the credentials were externalized, rotate your password immediately.
 - Always use a strong, unique password (16+ characters with mixed case, numbers, and symbols).
 
 ### Coolify Deployment
